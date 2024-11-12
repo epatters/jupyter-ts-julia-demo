@@ -19,9 +19,22 @@ kernel.statusChanged.connect((_, status) => {
 console.log('Executing code');
 
 const future = kernel.requestExecute({
-    code: 'println("Hello world"); x = 1',
+    code:
+`
+IJulia.register_mime(MIME"application/json"())
+
+struct JsonNumber
+  value::Number
+end
+
+Base.show(io::IO, ::MIME"application/json", num::JsonNumber) = print(io, num.value)
+
+println("Hello world")
+x = 1
+JsonNumber(x)
+`,
     user_expressions: {
-        "y": "2x",
+        "y": "JsonNumber(2x)",
     }
 });
 
@@ -34,7 +47,7 @@ future.onIOPub = msg => {
 const reply = await future.done;
 
 console.assert(reply.content.status === "ok");
-console.log(`Reply: ${JSON.stringify(reply.content, null, 2)}`);
+console.dir(reply.content, {depth: null});
 
 console.log('Execution is done');
 
