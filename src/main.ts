@@ -18,7 +18,12 @@ kernel.statusChanged.connect((_, status) => {
 
 console.log('Executing code');
 
-const future = kernel.requestExecute({ code: 'println("Hello world")' });
+const future = kernel.requestExecute({
+    code: 'println("Hello world"); x = 1',
+    user_expressions: {
+        "y": "2x",
+    }
+});
 
 // Handle iopub messages
 future.onIOPub = msg => {
@@ -26,7 +31,10 @@ future.onIOPub = msg => {
         console.log(msg.content);
     }
 };
-await future.done;
+const reply = await future.done;
+
+console.assert(reply.content.status === "ok");
+console.log(`Reply: ${JSON.stringify(reply.content, null, 2)}`);
 
 console.log('Execution is done');
 
