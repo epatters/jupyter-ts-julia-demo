@@ -1,8 +1,5 @@
 import { KernelManager, ServerConnection } from "@jupyterlab/services";
 
-// Launch Jupyter server with:
-// jupyter server --ServerApp.token="" --ServerApp.disable_check_xsrf=True
-
 const serverSettings = ServerConnection.makeSettings({
     baseUrl: "http://127.0.0.1:8888",
     token: "",
