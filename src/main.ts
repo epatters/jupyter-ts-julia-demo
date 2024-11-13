@@ -19,23 +19,11 @@ kernel.statusChanged.connect((_, status) => {
 console.log('Executing code');
 
 const future = kernel.requestExecute({
-    code:
-`
-IJulia.register_mime(MIME"application/json"())
-
-struct JsonNumber
-  value::Number
-end
-
-Base.show(io::IO, ::MIME"application/json", num::JsonNumber) = print(io, num.value)
-
-println("Hello world")
-x = 1
-JsonNumber(x)
-`,
-    user_expressions: {
-        "y": "JsonNumber(2x)",
-    }
+    code: 'include("setup_kernel.jl"); x = 2; JsonValue([x, 2x, 3x])',
+    // XXX: IJulia seems to not return JSON data for user expressions.
+    // user_expressions: {
+    //     "array": "JsonValue([x, 2x, 3x])",
+    // },
 });
 
 // Handle iopub messages
@@ -44,8 +32,9 @@ future.onIOPub = msg => {
         console.log(msg.content);
     }
 };
-const reply = await future.done;
 
+// Handle reply
+const reply = await future.done;
 console.assert(reply.content.status === "ok");
 console.dir(reply.content, {depth: null});
 

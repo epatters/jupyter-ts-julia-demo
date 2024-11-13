@@ -3,4 +3,8 @@
 *.log
 tmp/
 
+# Node
 node_modules/
+
+# Julia
+Manifest.toml
